@@ -63,6 +63,9 @@ namespace VRM
                 return;
             }
 
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+
             /// <summary>
             /// これは EditorApplication.delayCall により呼び出される。
             /// 
@@ -91,6 +94,9 @@ namespace VRM
                     editor.SaveAsAsset(loaded);
                 }
 
+                sw.Stop();
+
+                Debug.Log($"Import complete [importMs={sw.ElapsedMilliseconds}]");
             };
 
             using (var data = new GlbFileParser(vrmPath).Parse())
