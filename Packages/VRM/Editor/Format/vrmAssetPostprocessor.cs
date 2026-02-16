@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UniGLTF;
+using Unity.Profiling;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,6 +11,8 @@ namespace VRM
 {
     public class vrmAssetPostprocessor : AssetPostprocessor
     {
+        private static ProfilerMarker s_MarkerCreatePrefab = new ProfilerMarker("Create Prefab");
+
 #if !VRM_STOP_ASSETPOSTPROCESSOR
         static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
@@ -76,6 +79,8 @@ namespace VRM
             /// <value></value>
             Action<IEnumerable<UnityPath>> onCompleted = texturePaths =>
             {
+                s_MarkerCreatePrefab.Begin();
+
                 var map = texturePaths
                     .Select(x => x.LoadAsset<Texture>())
                     .ToDictionary(x => new SubAssetKey(x), x => x as UnityEngine.Object);
@@ -93,6 +98,9 @@ namespace VRM
                     var loaded = context.Load();
                     editor.SaveAsAsset(loaded);
                 }
+
+
+                s_MarkerCreatePrefab.End();
 
                 sw.Stop();
 
